@@ -7,7 +7,7 @@ const cube3D: ShaderExample = {
   description: '通过顶点着色器实现3D立方体的变形动画，演示MVP矩阵变换和法线计算',
   tags: ['3D', '顶点动画', 'MVP矩阵', '法线'],
   
-  vertexShader: `
+  vertexShader: /* wgsl */ `
 attribute vec3 a_position;
 attribute vec3 a_normal;
 
@@ -50,7 +50,7 @@ void main() {
     gl_Position = u_projectionMatrix * u_viewMatrix * worldPosition;
 }`,
 
-  fragmentShader: `
+  fragmentShader: /* wgsl */ `
 precision highp float;
 
 varying vec3 v_normal;

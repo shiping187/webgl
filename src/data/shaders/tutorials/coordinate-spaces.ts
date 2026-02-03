@@ -11,7 +11,7 @@ const coordinateSpaces: ShaderExample = {
   level: 'intermediate',
   tags: ['坐标', '变换', 'NDC', 'UV', '教学'],
 
-  vertexShader: `
+  vertexShader: /* wgsl */ `
 attribute vec2 a_position;
 varying vec2 v_position;  // 原始NDC坐标 [-1, 1]
 varying vec2 v_uv;        // UV坐标 [0, 1]
@@ -26,7 +26,7 @@ void main() {
     gl_Position = vec4(a_position, 0.0, 1.0);
 }`,
 
-  fragmentShader: `
+  fragmentShader: /* wgsl */ `
 precision mediump float;
 
 varying vec2 v_position;  // NDC: [-1, 1]

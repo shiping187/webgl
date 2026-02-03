@@ -7,7 +7,7 @@ const particles3D: ShaderExample = {
   description: '使用顶点着色器实现的GPU粒子系统，包含粒子生命周期、力场和交互效果',
   tags: ['3D', '粒子系统', 'GPU计算', '力场'],
   
-  vertexShader: `
+  vertexShader: /* wgsl */ `
 attribute vec3 a_position;      // 初始位置
 attribute vec3 a_velocity;      // 初始速度
 attribute vec2 a_params;        // x: 生命值偏移, y: 大小
@@ -89,7 +89,7 @@ void main() {
     gl_PointSize = baseSize * ageScale * speedScale / (depth * 0.5 + 1.0);
 }`,
 
-  fragmentShader: `
+  fragmentShader: /* wgsl */ `
 precision highp float;
 
 varying vec3 v_color;

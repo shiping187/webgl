@@ -11,7 +11,7 @@ const noiseBasic: ShaderExample = {
   level: 'intermediate',
   tags: ['噪声', 'hash', '随机'],
 
-  vertexShader: `
+  vertexShader: /* wgsl */ `
 attribute vec2 a_position;
 varying vec2 v_uv;
 
@@ -20,7 +20,7 @@ void main() {
     gl_Position = vec4(a_position, 0.0, 1.0);
 }`,
 
-  fragmentShader: `
+  fragmentShader: /* wgsl */ `
 precision highp float;
 varying vec2 v_uv;
 uniform float u_time;

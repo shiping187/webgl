@@ -7,7 +7,7 @@ const sphereDeform: ShaderExample = {
   description: '使用噪声函数对球体进行实时变形，创造有机的生物般的形态',
   tags: ['3D', '噪声变形', '球体', '有机形态'],
   
-  vertexShader: `
+  vertexShader: /* wgsl */ `
 attribute vec3 a_position;
 attribute vec3 a_normal;
 attribute vec2 a_uv;
@@ -148,7 +148,7 @@ void main() {
     gl_Position = u_projectionMatrix * u_viewMatrix * worldPosition;
 }`,
 
-  fragmentShader: `
+  fragmentShader: /* wgsl */ `
 precision highp float;
 
 varying vec3 v_normal;

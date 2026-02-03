@@ -11,7 +11,7 @@ const solidColor: ShaderExample = {
   level: 'basic',
   tags: ['入门', 'gl_FragColor', 'vec4'],
   
-  vertexShader: `
+  vertexShader: /* wgsl */ `
 // 顶点着色器 - 处理顶点位置
 attribute vec2 a_position;
 
@@ -21,7 +21,7 @@ void main() {
     gl_Position = vec4(a_position, 0.0, 1.0);
 }`,
 
-  fragmentShader: `
+  fragmentShader: /* wgsl */ `
 // 片段着色器 - 决定每个像素的颜色
 precision mediump float;
 

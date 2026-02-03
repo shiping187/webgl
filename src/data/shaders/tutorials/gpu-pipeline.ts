@@ -11,7 +11,7 @@ const gpuPipeline: ShaderExample = {
   level: 'intermediate',
   tags: ['管线', '顶点', '片段', '教学'],
 
-  vertexShader: `
+  vertexShader: /* wgsl */ `
 // ============================================
 // 顶点着色器 - GPU管线的第一个可编程阶段
 // ============================================
@@ -39,7 +39,7 @@ void main() {
     v_color = vec3(v_uv.x, v_uv.y, 1.0 - v_uv.x);
 }`,
 
-  fragmentShader: `
+  fragmentShader: /* wgsl */ `
 // ============================================
 // 片段着色器 - GPU管线的最后可编程阶段
 // ============================================
