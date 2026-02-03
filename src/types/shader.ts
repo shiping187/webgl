@@ -36,8 +36,12 @@ export interface ShaderExample {
   fragmentShader: string
   /** 详细讲解（Markdown格式） */
   explanation: string
-  /** 需要的uniform变量列表 */
-  uniforms: UniformName[]
+  /** 需要的uniform变量列表 (可选，已弃用) */
+  uniforms?: UniformName[]
+  /** 是否为3D场景 */
+  is3D?: boolean
+  /** 粒子数量（仅粒子系统使用） */
+  particleCount?: number
 }
 
 /**

@@ -11,6 +11,9 @@ import waterRipple from './water-ripple'
 import voronoiPattern from './voronoi-pattern'
 import glitchEffect from './glitch-effect'
 import metaball from './metaball'
+import cube3D from './cube-3d'
+import sphereDeform from './sphere-deform'
+import particles3D from './particles-3d'
 
 export const advancedShaders: ShaderExample[] = [
   raymarchingSphere,
@@ -19,7 +22,10 @@ export const advancedShaders: ShaderExample[] = [
   waterRipple,
   voronoiPattern,
   glitchEffect,
-  metaball
+  metaball,
+  cube3D,
+  sphereDeform,
+  particles3D
 ]
 
 export default advancedShaders

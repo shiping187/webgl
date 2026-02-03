@@ -26,6 +26,13 @@
             <span class="stat-label">种可能</span>
           </div>
         </div>
+        <div class="hero-actions">
+          <router-link to="/editor" class="editor-btn">
+            <span class="btn-icon">⚡</span>
+            <span>在线编辑器</span>
+            <span class="btn-arrow">→</span>
+          </router-link>
+        </div>
       </div>
       <div class="hero-visual">
         <canvas ref="heroCanvas" class="hero-canvas"></canvas>
@@ -385,6 +392,42 @@ onUnmounted(() => {
 .stat-label {
   font-size: 0.9rem;
   color: var(--text-muted);
+}
+
+.hero-actions {
+  margin-top: 32px;
+}
+
+.editor-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-lg);
+  color: var(--bg-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.editor-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glow-cyan);
+}
+
+.editor-btn .btn-icon {
+  font-size: 1.3rem;
+}
+
+.editor-btn .btn-arrow {
+  transition: transform 0.3s ease;
+}
+
+.editor-btn:hover .btn-arrow {
+  transform: translateX(4px);
 }
 
 .hero-visual {

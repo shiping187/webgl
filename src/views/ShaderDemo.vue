@@ -148,11 +148,12 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { shaders } from '../data/shaders'
 import { initShaderProgram, resizeCanvas } from '../utils/webgl'
+import { init3DScene, render3DScene, type WebGL3DContext } from '../utils/webgl-3d'
 import hljs from 'highlight.js/lib/core'
 import glsl from 'highlight.js/lib/languages/glsl'
 
@@ -177,6 +178,9 @@ let uniforms = {}
 let animationId = null
 let startTime = Date.now()
 let pausedTime = 0
+
+// 3D 渲染相关
+let context3D: WebGL3DContext | null = null
 
 // 计算属性
 const shader = computed(() => {
@@ -272,7 +276,36 @@ const initWebGL = () => {
   const canvas = shaderCanvas.value
   if (!canvas || !shader.value) return
   
-  // 获取所有需要的uniform
+  // 检查是否是 3D 场景
+  if (shader.value.is3D) {
+    // 根据 shader ID 确定几何体类型
+    let geometryType: 'cube' | 'sphere' | 'particles' = 'cube'
+    if (shader.value.id.includes('sphere')) {
+      geometryType = 'sphere'
+    } else if (shader.value.id.includes('particles')) {
+      geometryType = 'particles'
+    }
+    
+    context3D = init3DScene(
+      canvas,
+      shader.value.vertexShader,
+      shader.value.fragmentShader,
+      geometryType,
+      shader.value.particleCount
+    )
+    
+    if (!context3D) {
+      console.error('3D 场景初始化失败')
+      return
+    }
+    
+    gl = context3D.gl
+    startTime = Date.now()
+    animate3D()
+    return
+  }
+  
+  // 2D 场景的原有逻辑
   const uniformNames = ['u_time', 'u_resolution', 'u_mouse']
   
   const result = initShaderProgram(
@@ -328,6 +361,21 @@ const animate = () => {
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
   
   animationId = requestAnimationFrame(animate)
+}
+
+// 3D 场景动画循环
+const animate3D = () => {
+  if (!context3D || !isPlaying.value) {
+    animationId = requestAnimationFrame(animate3D)
+    return
+  }
+  
+  const currentTime = (Date.now() - startTime) / 1000 + pausedTime
+  displayTime.value = currentTime
+  
+  render3DScene(context3D, currentTime, mousePos.value, shaderCanvas.value)
+  
+  animationId = requestAnimationFrame(animate3D)
 }
 
 const togglePlay = () => {
@@ -399,6 +447,9 @@ onUnmounted(() => {
     cancelAnimationFrame(animationId)
   }
   shaderCanvas.value?.removeEventListener('mousemove', handleMouseMove)
+  
+  // 清理 3D 资源
+  context3D = null
 })
 
 // 监听路由变化，重新初始化
@@ -406,6 +457,13 @@ watch(() => route.params.id, () => {
   if (animationId) {
     cancelAnimationFrame(animationId)
   }
+  
+  // 清理旧的 3D 资源
+  context3D = null
+  gl = null
+  program = null
+  uniforms = {}
+  
   pausedTime = 0
   displayTime.value = 0
   isPlaying.value = true

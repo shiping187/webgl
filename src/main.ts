@@ -6,10 +6,12 @@ import './styles/main.css'
 // 导入所有shader示例组件
 import Home from './views/Home.vue'
 import ShaderDemo from './views/ShaderDemo.vue'
+import ShaderEditor from './views/ShaderEditor.vue'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: Home },
-  { path: '/shader/:id', component: ShaderDemo, props: true }
+  { path: '/shader/:id', component: ShaderDemo, props: true },
+  { path: '/editor', component: ShaderEditor }
 ]
 
 const router = createRouter({

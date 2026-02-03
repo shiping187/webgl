@@ -158,101 +158,58 @@ export function resizeCanvas(canvas: HTMLCanvasElement, gl: WebGLRenderingContex
 }
 
 /**
- * 为卡片预览初始化简化的shader
+ * HSV 转 RGB 颜色空间
+ */
+function hsvToRgb(h: number, s: number, v: number): [number, number, number] {
+  const c = v * s
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1))
+  const m = v - c
+  
+  let r = 0, g = 0, b = 0
+  if (h < 60) { r = c; g = x; b = 0 }
+  else if (h < 120) { r = x; g = c; b = 0 }
+  else if (h < 180) { r = 0; g = c; b = x }
+  else if (h < 240) { r = 0; g = x; b = c }
+  else if (h < 300) { r = x; g = 0; b = c }
+  else { r = c; g = 0; b = x }
+  
+  return [
+    Math.round((r + m) * 255),
+    Math.round((g + m) * 255),
+    Math.round((b + m) * 255)
+  ]
+}
+
+/**
+ * 为卡片预览初始化简化的shader（使用Canvas 2D避免WebGL上下文过多）
  * @param canvas - Canvas元素
  * @param shaderId - Shader ID
  */
-export function initPreviewShader(canvas: HTMLCanvasElement, shaderId: string): void {
+export function initPreviewShader(canvas: HTMLCanvasElement | null, shaderId: string): void {
   if (!canvas) return
   
-  const gl = canvas.getContext('webgl')
-  if (!gl) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+  
+  // 确保 canvas 有有效尺寸
+  const width = canvas.clientWidth || 300
+  const height = canvas.clientHeight || 200
+  const dpr = window.devicePixelRatio || 1
   
   // 设置canvas尺寸
-  canvas.width = canvas.clientWidth * window.devicePixelRatio
-  canvas.height = canvas.clientHeight * window.devicePixelRatio
-  gl.viewport(0, 0, canvas.width, canvas.height)
+  canvas.width = width * dpr
+  canvas.height = height * dpr
+  ctx.scale(dpr, dpr)
   
-  // 简单的预览shader - 根据ID生成不同的图案
-  const vertexShaderSource = `
-    attribute vec2 a_position;
-    varying vec2 v_uv;
-    void main() {
-      v_uv = a_position * 0.5 + 0.5;
-      gl_Position = vec4(a_position, 0.0, 1.0);
-    }
-  `
+  // 根据 shaderId 生成唯一的颜色
+  const hash = shaderId.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0)
+  const hue1 = Math.abs(hash % 360)
+  const hue2 = (hue1 + 180) % 360
   
-  // 根据shader ID选择不同的预览效果
-  const getPreviewFragment = (id: string): string => {
-    const hash = id.split('').reduce((a, b) => ((a << 5) - a + b.charCodeAt(0)) | 0, 0)
-    const hue = Math.abs(hash % 360)
-    
-    return `
-      precision mediump float;
-      varying vec2 v_uv;
-      uniform float u_time;
-      
-      vec3 hsv2rgb(vec3 c) {
-        vec4 K = vec4(1.0, 2.0/3.0, 1.0/3.0, 3.0);
-        vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-        return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
-      }
-      
-      float hash(vec2 p) {
-        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
-      }
-      
-      void main() {
-        vec2 uv = v_uv;
-        float t = u_time * 0.5;
-        
-        // 根据ID生成不同图案
-        float pattern = sin(uv.x * 10.0 + t) * sin(uv.y * 10.0 + t * 0.7);
-        pattern += sin(length(uv - 0.5) * 15.0 - t * 2.0) * 0.5;
-        pattern = pattern * 0.5 + 0.5;
-        
-        // 基于ID的颜色
-        float hue = ${hue.toFixed(1)} / 360.0;
-        vec3 color1 = hsv2rgb(vec3(hue, 0.7, 0.9));
-        vec3 color2 = hsv2rgb(vec3(hue + 0.5, 0.6, 0.3));
-        
-        vec3 color = mix(color2, color1, pattern);
-        
-        // 添加一点噪声
-        color += (hash(uv * 100.0 + t) - 0.5) * 0.05;
-        
-        gl_FragColor = vec4(color, 1.0);
-      }
-    `
-  }
+  const [r1, g1, b1] = hsvToRgb(hue1, 0.7, 0.9)
+  const [r2, g2, b2] = hsvToRgb(hue2, 0.6, 0.3)
   
-  const fragmentShaderSource = getPreviewFragment(shaderId)
-  
-  // 创建着色器
-  const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource)
-  const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource)
-  
-  if (!vertexShader || !fragmentShader) return
-  
-  const program = createProgram(gl, vertexShader, fragmentShader)
-  if (!program) return
-  
-  // 设置顶点
-  const positions = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1])
-  const buffer = gl.createBuffer()
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer)
-  gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW)
-  
-  const positionLocation = gl.getAttribLocation(program, 'a_position')
-  gl.enableVertexAttribArray(positionLocation)
-  gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0)
-  
-  gl.useProgram(program)
-  
-  const timeLocation = gl.getUniformLocation(program, 'u_time')
-  
-  // 动画循环
+  // 动画参数
   let animationId: number
   const startTime = Date.now()
   
@@ -263,8 +220,62 @@ export function initPreviewShader(canvas: HTMLCanvasElement, shaderId: string): 
     }
     
     const time = (Date.now() - startTime) / 1000
-    gl.uniform1f(timeLocation, time)
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4)
+    
+    // 创建动态渐变背景
+    const gradient = ctx.createRadialGradient(
+      width / 2 + Math.sin(time) * 30, 
+      height / 2 + Math.cos(time * 0.7) * 20,
+      0,
+      width / 2, 
+      height / 2,
+      Math.max(width, height) * 0.8
+    )
+    
+    gradient.addColorStop(0, `rgb(${r1}, ${g1}, ${b1})`)
+    gradient.addColorStop(0.5, `rgb(${(r1 + r2) / 2}, ${(g1 + g2) / 2}, ${(b1 + b2) / 2})`)
+    gradient.addColorStop(1, `rgb(${r2}, ${g2}, ${b2})`)
+    
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, width, height)
+    
+    // 添加动态波纹效果
+    ctx.globalAlpha = 0.3
+    for (let i = 0; i < 3; i++) {
+      const waveTime = time + i * 0.5
+      const cx = width / 2 + Math.sin(waveTime * 0.8 + i) * width * 0.2
+      const cy = height / 2 + Math.cos(waveTime * 0.6 + i) * height * 0.2
+      const radius = (Math.sin(waveTime * 2) * 0.5 + 0.5) * Math.min(width, height) * 0.4 + 20
+      
+      const waveGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius)
+      waveGradient.addColorStop(0, `rgba(255, 255, 255, 0.4)`)
+      waveGradient.addColorStop(0.5, `rgba(255, 255, 255, 0.1)`)
+      waveGradient.addColorStop(1, `rgba(255, 255, 255, 0)`)
+      
+      ctx.fillStyle = waveGradient
+      ctx.fillRect(0, 0, width, height)
+    }
+    ctx.globalAlpha = 1.0
+    
+    // 添加网格线效果
+    ctx.strokeStyle = `rgba(255, 255, 255, 0.1)`
+    ctx.lineWidth = 1
+    const gridSize = 30
+    const offsetX = (time * 20) % gridSize
+    const offsetY = (time * 15) % gridSize
+    
+    for (let x = -gridSize + offsetX; x < width + gridSize; x += gridSize) {
+      ctx.beginPath()
+      ctx.moveTo(x, 0)
+      ctx.lineTo(x, height)
+      ctx.stroke()
+    }
+    for (let y = -gridSize + offsetY; y < height + gridSize; y += gridSize) {
+      ctx.beginPath()
+      ctx.moveTo(0, y)
+      ctx.lineTo(width, y)
+      ctx.stroke()
+    }
+    
     animationId = requestAnimationFrame(animate)
   }
   
