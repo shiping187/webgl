@@ -1,0 +1,25 @@
+# 依赖目录
+node_modules/
+
+# 构建输出
+dist/
+
+# 编辑器目录
+.vscode/
+.idea/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志文件
+*.log
+npm-debug.log*
+
+# 环境变量
+.env
+.env.local
+.env.*.local
+
+# 缓存
+.cache/

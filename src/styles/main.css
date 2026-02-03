@@ -1,0 +1,176 @@
+/* ============================================
+   WebGL Shader 特效展示馆 - 主样式文件
+   ============================================ */
+
+:root {
+  /* 暗色主题配色 - 灵感来自赛博朋克风格 */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-tertiary: #1a1a2e;
+  --bg-card: #16161f;
+  
+  /* 霓虹色彩系统 */
+  --neon-cyan: #00fff5;
+  --neon-pink: #ff00ff;
+  --neon-purple: #9d4edd;
+  --neon-blue: #4361ee;
+  --neon-green: #00f5d4;
+  --neon-orange: #ff6b35;
+  --neon-yellow: #ffd60a;
+  
+  /* 渐变 */
+  --gradient-primary: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-purple) 100%);
+  --gradient-secondary: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-orange) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--neon-blue) 0%, var(--neon-green) 100%);
+  
+  /* 文字颜色 */
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0b0;
+  --text-muted: #6c6c80;
+  
+  /* 边框与阴影 */
+  --border-color: rgba(255, 255, 255, 0.08);
+  --glow-cyan: 0 0 20px rgba(0, 255, 245, 0.3);
+  --glow-pink: 0 0 20px rgba(255, 0, 255, 0.3);
+  --glow-purple: 0 0 20px rgba(157, 78, 221, 0.3);
+  
+  /* 字体 */
+  --font-sans: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* 圆角 */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--neon-purple);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
+}
+
+/* 文字选中样式 */
+::selection {
+  background: var(--neon-purple);
+  color: white;
+}
+
+/* 链接样式 */
+a {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  color: var(--neon-pink);
+  text-shadow: var(--glow-pink);
+}
+
+/* 按钮基础样式 */
+button {
+  font-family: var(--font-sans);
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 代码样式 */
+code, pre {
+  font-family: var(--font-mono);
+}
+
+/* 动画关键帧 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 245, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(0, 255, 245, 0.6); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* 实用工具类 */
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 5s ease infinite;
+}
+
+.fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+}
+
+/* 响应式容器 */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* 网格背景 */
+.grid-bg {
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
