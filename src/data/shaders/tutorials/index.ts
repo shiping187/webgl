@@ -10,6 +10,9 @@ import vertexProcessing from './vertex-processing'
 import rasterization from './rasterization'
 import framebufferOps from './framebuffer-ops'
 
+// WebGL版本与基础
+import webglVersions from './webgl-versions'
+
 // 原有教学示例
 import gpuPipeline from './gpu-pipeline'
 import coordinateSpaces from './coordinate-spaces'
@@ -23,6 +26,9 @@ export const tutorialShaders: ShaderExample[] = [
   vertexProcessing,     // 2. 顶点处理阶段详解
   rasterization,        // 3. 光栅化与插值原理
   framebufferOps,       // 4. 帧缓冲与像素操作
+  
+  // WebGL版本对比
+  webglVersions,        // WebGL 1.0 vs 2.0 完整对比
   
   // 其他教学内容
   gpuPipeline,          // GPU管线原理（简版）
